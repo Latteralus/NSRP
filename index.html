@@ -1,776 +1,637 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RedM Blacksmith Business Tool</title>
-    <style>
-        :root {
-            --primary-color: #3d5a80;
-            --secondary-color: #98c1d9;
-            --accent-color: #ee6c4d;
-            --light-color: #f7f7f7;
-            --dark-color: #293241;
-            --border-radius: 8px;
-            --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: var(--light-color);
-            color: var(--dark-color);
-            padding: 20px;
-            line-height: 1.6;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: var(--dark-color);
-            color: var(--light-color);
-            border-radius: var(--border-radius);
-        }
-        
-        h1, h2, h3 {
-            margin-bottom: 15px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .section {
-            background-color: white;
-            margin-bottom: 20px;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-        }
-        
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .section-content {
-            display: none;
-            padding-top: 15px;
-        }
-        
-        .section-content.active {
-            display: block;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-        }
-        
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-        
-        th {
-            background-color: var(--secondary-color);
-            color: var(--dark-color);
-        }
-        
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        .profit-positive {
-            color: green;
-        }
-        
-        .profit-negative {
-            color: red;
-        }
-        
-        .item-card {
-            border: 1px solid #eee;
-            border-radius: var(--border-radius);
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .item-header {
-            display: flex;
-            justify-content: space-between;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .item-content {
-            display: none;
-            margin-top: 10px;
-        }
-        
-        .item-content.active {
-            display: block;
-        }
-        
-        .calculator {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .calculator-inputs {
-            flex: 1;
-            min-width: 300px;
-        }
-        
-        .calculator-results {
-            flex: 2;
-            min-width: 300px;
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: var(--border-radius);
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        
-        select, input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        .btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .btn:hover {
-            background-color: var(--accent-color);
-        }
-        
-        .toggle-icon::after {
-            content: "▼";
-            margin-left: 5px;
-            font-size: 0.8em;
-        }
-        
-        .section-header.active .toggle-icon::after,
-        .item-header.active .toggle-icon::after {
-            content: "▲";
-        }
-        
-        .result-table {
-            margin-top: 15px;
-        }
-        
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            .calculator {
-                flex-direction: column;
-            }
-            
-            .calculator-inputs,
-            .calculator-results {
-                min-width: 100%;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RedM Blacksmith Business Tool</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>RedM Blacksmith Business Tool</h1>
-            <p>Manage your blacksmith shop efficiently by calculating costs, profits, and resource requirements</p>
-        </header>
-        
-        <!-- Shop Overview Section -->
-        <div class="section">
-            <div class="section-header active" onclick="toggleSection(this)">
-                <h2>Shop Overview</h2>
-                <span class="toggle-icon"></span>
-            </div>
-            <div class="section-content active">
-                <h3>Raw Material Costs</h3>
-                <table id="raw-materials-table">
-                    <thead>
-                        <tr>
-                            <th>Material</th>
-                            <th>Cost Per Unit ($)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Wood Logs</td>
-                            <td><input type="number" id="wood-logs-cost" value="2.00" min="0" step="0.01" onchange="updateCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Iron Ore</td>
-                            <td><input type="number" id="iron-ore-cost" value="0.60" min="0" step="0.01" onchange="updateCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Coal</td>
-                            <td><input type="number" id="coal-cost" value="0.50" min="0" step="0.01" onchange="updateCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Buck Skin</td>
-                            <td><input type="number" id="buck-skin-cost" value="1.00" min="0" step="0.01" onchange="updateCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Copper</td>
-                            <td><input type="number" id="copper-cost" value="0.50" min="0" step="0.01" onchange="updateCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Clay</td>
-                            <td><input type="number" id="clay-cost" value="" min="0" step="0.01" placeholder="Enter cost" onchange="updateCalculations()"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-hammer"></i> Blacksmith</h2>
+        <button type="button" id="theme-toggle" class="theme-toggle">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+      <ul class="nav-links">
+        <li class="nav-item active" data-target="dashboard">
+          <i class="fas fa-chart-line"></i> Dashboard
+        </li>
+        <li class="nav-item" data-target="inventory">
+          <i class="fas fa-boxes"></i> Inventory
+        </li>
+        <li class="nav-item" data-target="recipes">
+          <i class="fas fa-scroll"></i> Recipes
+        </li>
+        <li class="nav-item" data-target="production">
+          <i class="fas fa-industry"></i> Production
+        </li>
+        <li class="nav-item" data-target="pricing">
+          <i class="fas fa-tag"></i> Pricing
+        </li>
+        <li class="nav-item" data-target="reports">
+          <i class="fas fa-chart-bar"></i> Reports
+        </li>
+        <li class="nav-item" data-target="settings">
+          <i class="fas fa-cog"></i> Settings
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <button type="button" id="save-data" class="btn btn-secondary">
+          <i class="fas fa-save"></i> Save Data
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="main-header">
+        <h1>RedM Blacksmith Business Tool</h1>
+        <div class="header-actions">
+          <div class="search-bar">
+            <input type="text" placeholder="Search...">
+            <i class="fas fa-search"></i>
+          </div>
+          <div class="notification">
+            <i class="fas fa-bell"></i>
+            <span class="badge">3</span>
+          </div>
         </div>
-        
-        <!-- Craftable Item Recipes Section -->
-        <div class="section">
-            <div class="section-header" onclick="toggleSection(this)">
-                <h2>Craftable Item Recipes</h2>
-                <span class="toggle-icon"></span>
+      </header>
+
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="content-section active">
+        <div class="section-header">
+          <h2>Dashboard</h2>
+          <span>Business Overview</span>
+        </div>
+                
+        <div class="dashboard-summary">
+          <div class="summary-card">
+            <div class="card-icon">
+              <i class="fas fa-coins"></i>
             </div>
-            <div class="section-content">
-                <div id="craftable-items">
-                    <!-- Iron Bar -->
-                    <div class="item-card">
-                        <div class="item-header" onclick="toggleItem(this)">
-                            <span>Iron Bar (makes 5)</span>
-                            <span class="toggle-icon"></span>
-                        </div>
-                        <div class="item-content">
-                            <h4>Ingredients:</h4>
-                            <table>
-                                <tr>
-                                    <td>Iron Ore:</td>
-                                    <td><input type="number" value="5" min="0" step="1" id="iron-bar-iron-ore" onchange="updateItemCosts('iron-bar')"></td>
-                                </tr>
-                                <tr>
-                                    <td>Coal:</td>
-                                    <td><input type="number" value="2" min="0" step="1" id="iron-bar-coal" onchange="updateItemCosts('iron-bar')"></td>
-                                </tr>
-                            </table>
-                            <div>
-                                <p>Total Cost: $<span id="iron-bar-cost">0.00</span></p>
-                                <p>Sale Value: $<input type="number" value="1.00" min="0" step="0.01" id="iron-bar-value" onchange="updateItemCosts('iron-bar')"></p>
-                                <p>Profit per Craft: $<span id="iron-bar-profit">0.00</span></p>
-                            </div>
-                        </div>
-                    </div>
+            <div class="card-content">
+              <h3>Revenue</h3>
+              <p class="value" id="total-revenue">$0.00</p>
+              <p class="trend positive">+15% <i class="fas fa-arrow-up"></i></p>
+            </div>
+          </div>
                     
-                    <!-- Nails -->
-                    <div class="item-card">
-                        <div class="item-header" onclick="toggleItem(this)">
-                            <span>Nails (makes 5)</span>
-                            <span class="toggle-icon"></span>
-                        </div>
-                        <div class="item-content">
-                            <h4>Ingredients:</h4>
-                            <table>
-                                <tr>
-                                    <td>Iron Bar:</td>
-                                    <td><input type="number" value="1" min="0" step="1" id="nails-iron-bar" onchange="updateItemCosts('nails')"></td>
-                                </tr>
-                            </table>
-                            <div>
-                                <p>Total Cost: $<span id="nails-cost">0.00</span></p>
-                                <p>Sale Value: $<input type="number" value="0.30" min="0" step="0.01" id="nails-value" onchange="updateItemCosts('nails')"></p>
-                                <p>Profit per Craft: $<span id="nails-profit">0.00</span></p>
-                            </div>
-                        </div>
-                    </div>
+          <div class="summary-card">
+            <div class="card-icon">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="card-content">
+              <h3>Profit</h3>
+              <p class="value" id="total-profit">$0.00</p>
+              <p class="trend positive">+8% <i class="fas fa-arrow-up"></i></p>
+            </div>
+          </div>
                     
-                    <!-- Shell Casing -->
-                    <div class="item-card">
-                        <div class="item-header" onclick="toggleItem(this)">
-                            <span>Shell Casing (makes 20)</span>
-                            <span class="toggle-icon"></span>
-                        </div>
-                        <div class="item-content">
-                            <h4>Ingredients:</h4>
-                            <table>
-                                <tr>
-                                    <td>Iron Bar:</td>
-                                    <td><input type="number" value="5" min="0" step="1" id="shell-casing-iron-bar" onchange="updateItemCosts('shell-casing')"></td>
-                                </tr>
-                                <tr>
-                                    <td>Copper:</td>
-                                    <td><input type="number" value="2" min="0" step="1" id="shell-casing-copper" onchange="updateItemCosts('shell-casing')"></td>
-                                </tr>
-                            </table>
-                            <div>
-                                <p>Total Cost: $<span id="shell-casing-cost">0.00</span></p>
-                                <p>Sale Value: $<input type="number" value="5.00" min="0" step="0.01" id="shell-casing-value" onchange="updateItemCosts('shell-casing')"></p>
-                                <p>Profit per Craft: $<span id="shell-casing-profit">0.00</span></p>
-                            </div>
-                        </div>
-                    </div>
+          <div class="summary-card">
+            <div class="card-icon">
+              <i class="fas fa-boxes"></i>
+            </div>
+            <div class="card-content">
+              <h3>Inventory Value</h3>
+              <p class="value" id="inventory-value">$0.00</p>
+              <p class="trend negative">-3% <i class="fas fa-arrow-down"></i></p>
+            </div>
+          </div>
                     
-                    <!-- Silver Horseshoes -->
-                    <div class="item-card">
-                        <div class="item-header" onclick="toggleItem(this)">
-                            <span>Silver Horseshoes (makes 2)</span>
-                            <span class="toggle-icon"></span>
-                        </div>
-                        <div class="item-content">
-                            <h4>Ingredients:</h4>
-                            <table>
-                                <tr>
-                                    <td>Iron Ore:</td>
-                                    <td><input type="number" value="4" min="0" step="1" id="silver-horseshoes-iron-ore" onchange="updateItemCosts('silver-horseshoes')"></td>
-                                </tr>
-                                <tr>
-                                    <td>Coal:</td>
-                                    <td><input type="number" value="2" min="0" step="1" id="silver-horseshoes-coal" onchange="updateItemCosts('silver-horseshoes')"></td>
-                                </tr>
-                            </table>
-                            <div>
-                                <p>Total Cost: $<span id="silver-horseshoes-cost">0.00</span></p>
-                                <p>Sale Value: $<input type="number" value="5.00" min="0" step="0.01" id="silver-horseshoes-value" onchange="updateItemCosts('silver-horseshoes')"></p>
-                                <p>Profit per Craft: $<span id="silver-horseshoes-profit">0.00</span></p>
-                            </div>
-                        </div>
-                    </div>
+          <div class="summary-card">
+            <div class="card-icon">
+              <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="card-content">
+              <h3>Orders</h3>
+              <p class="value" id="total-orders">0</p>
+              <p class="trend positive">+5% <i class="fas fa-arrow-up"></i></p>
+            </div>
+          </div>
+        </div>
+                
+        <div class="dashboard-charts">
+          <div class="chart-container">
+            <h3>Profit Margins</h3>
+            <div class="chart" id="profit-chart">
+              <!-- Chart will be rendered here -->
+              <div class="chart-placeholder">
+                <i class="fas fa-chart-line"></i>
+                <p>Profit data visualization</p>
+              </div>
+            </div>
+          </div>
                     
-                    <!-- Pickaxe -->
-                    <div class="item-card">
-                        <div class="item-header" onclick="toggleItem(this)">
-                            <span>Pickaxe (makes 1)</span>
-                            <span class="toggle-icon"></span>
-                        </div>
-                        <div class="item-content">
-                            <h4>Ingredients:</h4>
-                            <table>
-                                <tr>
-                                    <td>Iron Bar:</td>
-                                    <td><input type="number" value="2" min="0" step="1" id="pickaxe-iron-bar" onchange="updateItemCosts('pickaxe')"></td>
-                                </tr>
-                                <tr>
-                                    <td>Wood Logs:</td>
-                                    <td><input type="number" value="1" min="0" step="1" id="pickaxe-wood-logs" onchange="updateItemCosts('pickaxe')"></td>
-                                </tr>
-                            </table>
-                            <div>
-                                <p>Total Cost: $<span id="pickaxe-cost">0.00</span></p>
-                                <p>Sale Value: $<input type="number" value="10.00" min="0" step="0.01" id="pickaxe-value" onchange="updateItemCosts('pickaxe')"></p>
-                                <p>Profit per Craft: $<span id="pickaxe-profit">0.00</span></p>
-                            </div>
-                        </div>
-                    </div>
+          <div class="chart-container">
+            <h3>Top Selling Items</h3>
+            <div class="chart" id="sales-chart">
+              <!-- Chart will be rendered here -->
+              <div class="chart-placeholder">
+                <i class="fas fa-chart-bar"></i>
+                <p>Sales data visualization</p>
+              </div>
+            </div>
+          </div>
+        </div>
+                
+        <div class="alerts-container">
+          <h3><i class="fas fa-exclamation-triangle"></i> Alerts</h3>
+          <div class="alert-item low-stock">
+            <div class="alert-icon">
+              <i class="fas fa-boxes"></i>
+            </div>
+            <div class="alert-content">
+              <h4>Low Stock Alert</h4>
+              <p>Iron Ore is running low (5 units remaining)</p>
+            </div>
+            <div class="alert-action">
+              <button type="button" class="btn btn-small">Order</button>
+            </div>
+          </div>
+                    
+          <div class="alert-item profit-warning">
+            <div class="alert-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="alert-content">
+              <h4>Profit Margin Alert</h4>
+              <p>Nails have a negative profit margin (-$0.05)</p>
+            </div>
+            <div class="alert-action">
+              <button type="button" class="btn btn-small">Adjust</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Inventory Section -->
+      <section id="inventory" class="content-section">
+        <div class="section-header">
+          <h2>Inventory Management</h2>
+          <div class="action-buttons">
+            <button type="button" class="btn" id="add-inventory">
+              <i class="fas fa-plus"></i> Add Item
+            </button>
+            <button type="button" class="btn btn-secondary" id="export-inventory">
+              <i class="fas fa-file-export"></i> Export
+            </button>
+          </div>
+        </div>
+                
+        <div class="inventory-tabs">
+          <div class="tab active" data-target="raw-materials">Raw Materials</div>
+          <div class="tab" data-target="crafted-items">Crafted Items</div>
+        </div>
+                
+        <div id="raw-materials" class="tab-content active">
+          <div class="filters">
+            <input type="text" placeholder="Filter materials...">
+            <select>
+              <option value="all">All Categories</option>
+              <option value="metal">Metals</option>
+              <option value="fuel">Fuel</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+                    
+          <table class="inventory-table">
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>Quantity</th>
+                <th>Cost Per Unit</th>
+                <th>Total Value</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="materials-inventory">
+              <!-- Table content will be populated by JS -->
+            </tbody>
+          </table>
+                    
+          <div class="inventory-summary">
+            <div class="summary-item">
+              <span>Total Materials:</span>
+              <span id="total-material-types">0</span>
+            </div>
+            <div class="summary-item">
+              <span>Total Units:</span>
+              <span id="total-material-units">0</span>
+            </div>
+            <div class="summary-item">
+              <span>Total Value:</span>
+              <span id="total-material-value">$0.00</span>
+            </div>
+          </div>
+        </div>
+                
+        <div id="crafted-items" class="tab-content">
+          <div class="filters">
+            <input type="text" placeholder="Filter items...">
+            <select>
+              <option value="all">All Categories</option>
+              <option value="tools">Tools</option>
+              <option value="weapons">Weapon Parts</option>
+              <option value="misc">Miscellaneous</option>
+            </select>
+          </div>
+                    
+          <table class="inventory-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Cost to Produce</th>
+                <th>Sale Price</th>
+                <th>Profit Margin</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="crafted-inventory">
+              <!-- Table content will be populated by JS -->
+            </tbody>
+          </table>
+                    
+          <div class="inventory-summary">
+            <div class="summary-item">
+              <span>Total Items:</span>
+              <span id="total-crafted-types">0</span>
+            </div>
+            <div class="summary-item">
+              <span>Total Units:</span>
+              <span id="total-crafted-units">0</span>
+            </div>
+            <div class="summary-item">
+              <span>Total Value:</span>
+              <span id="total-crafted-value">$0.00</span>
+            </div>
+          </div>
+        </div>
+      </section>
+            
+      <!-- Recipes Section -->
+      <section id="recipes" class="content-section">
+        <div class="section-header">
+          <h2>Recipes & Crafting</h2>
+          <div class="action-buttons">
+            <button type="button" class="btn" id="add-recipe">
+              <i class="fas fa-plus"></i> New Recipe
+            </button>
+          </div>
+        </div>
+                
+        <div class="recipe-list" id="recipe-container">
+          <!-- Recipe cards will be populated by JS -->
+        </div>
+      </section>
+            
+      <!-- Production Section -->
+      <section id="production" class="content-section">
+        <div class="section-header">
+          <h2>Production Planning</h2>
+          <span>Optimize your crafting schedule</span>
+        </div>
+                
+        <div class="production-calculator">
+          <div class="calculator-inputs">
+            <div class="form-group">
+              <label for="prod-item-select">Item to Produce:</label>
+              <select id="prod-item-select">
+                <!-- Options will be populated by JS -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="prod-quantity">Quantity to Produce:</label>
+              <input type="number" id="prod-quantity" value="1" min="1">
+            </div>
+            <div class="form-group">
+              <label for="prod-priority">Priority:</label>
+              <select id="prod-priority">
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="prod-timeline">Timeline:</label>
+              <input type="date" id="prod-timeline">
+            </div>
+            <button type="button" class="btn" id="add-to-production">Add to Production Queue</button>
+          </div>
+                    
+          <div class="calculator-results">
+            <h3>Production Requirements</h3>
+                        
+            <div class="requirements-group">
+              <h4>Materials Needed:</h4>
+              <ul id="prod-materials-list">
+                <!-- Materials will be populated by JS -->
+              </ul>
+            </div>
+                        
+            <div class="requirements-group">
+              <h4>Current Inventory Status:</h4>
+              <ul id="prod-inventory-status">
+                <!-- Inventory status will be populated by JS -->
+              </ul>
+            </div>
+                        
+            <div class="requirements-group">
+              <h4>Production Summary:</h4>
+              <div class="summary-detail">
+                <span>Total Cost:</span>
+                <span id="prod-total-cost">$0.00</span>
+              </div>
+              <div class="summary-detail">
+                <span>Estimated Time:</span>
+                <span id="prod-estimated-time">0 minutes</span>
+              </div>
+              <div class="summary-detail">
+                <span>Expected Profit:</span>
+                <span id="prod-expected-profit" class="profit-positive">$0.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+                
+        <div class="production-queue">
+          <h3>Production Queue</h3>
+          <table class="queue-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Materials Status</th>
+                <th>Timeline</th>
+                <th>Est. Profit</th>
+                <th>Priority</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="queue-list">
+              <!-- Queue items will be populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+            
+      <!-- Pricing Section -->
+      <section id="pricing" class="content-section">
+        <div class="section-header">
+          <h2>Price Management</h2>
+          <span>Optimize your profits with smart pricing</span>
+        </div>
+                
+        <div class="pricing-tools">
+          <div class="pricing-calculator">
+            <h3>Pricing Calculator</h3>
+            <div class="calculator-form">
+              <div class="form-group">
+                <label for="price-item">Select Item:</label>
+                <select id="price-item">
+                  <!-- Options will be populated by JS -->
+                </select>
+              </div>
+              <div class="cost-breakdown">
+                <div class="cost-item">
+                  <span>Production Cost:</span>
+                  <span id="price-production-cost">$0.00</span>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Production Calculator Section -->
-        <div class="section">
-            <div class="section-header" onclick="toggleSection(this)">
-                <h2>Production Calculator</h2>
-                <span class="toggle-icon"></span>
-            </div>
-            <div class="section-content">
-                <div class="calculator">
-                    <div class="calculator-inputs">
-                        <div class="form-group">
-                            <label for="item-select">Select Item:</label>
-                            <select id="item-select" onchange="updateProductionCalculator()">
-                                <option value="iron-bar">Iron Bar (makes 5)</option>
-                                <option value="nails">Nails (makes 5)</option>
-                                <option value="shell-casing">Shell Casing (makes 20)</option>
-                                <option value="silver-horseshoes">Silver Horseshoes (makes 2)</option>
-                                <option value="pickaxe">Pickaxe (makes 1)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="quantity">Quantity to Produce:</label>
-                            <input type="number" id="quantity" value="1" min="1" step="1" onchange="updateProductionCalculator()">
-                        </div>
-                        <button class="btn" onclick="updateProductionCalculator()">Calculate</button>
-                    </div>
-                    <div class="calculator-results">
-                        <h3>Production Results</h3>
-                        <div id="production-materials">
-                            <h4>Materials Needed:</h4>
-                            <ul id="materials-list">
-                                <!-- Populated by JavaScript -->
-                            </ul>
-                        </div>
-                        <div id="production-summary">
-                            <h4>Summary:</h4>
-                            <p>Total Cost: $<span id="production-cost">0.00</span></p>
-                            <p>Total Value: $<span id="production-value">0.00</span></p>
-                            <p>Projected Profit: $<span id="production-profit">0.00</span></p>
-                        </div>
-                    </div>
+                <div class="cost-item">
+                  <span>Target Profit Margin (%):</span>
+                  <input type="number" id="price-margin" value="30" min="0" max="100">
                 </div>
+                <div class="cost-item">
+                  <span>Competitor Price:</span>
+                  <input type="number" id="price-competitor" value="0.00" min="0" step="0.01">
+                </div>
+                <div class="cost-item result">
+                  <span>Recommended Price:</span>
+                  <span id="price-recommended">$0.00</span>
+                </div>
+                <div class="cost-item result">
+                  <span>Current Price:</span>
+                  <span id="price-current">$0.00</span>
+                </div>
+                <div class="cost-item result">
+                  <span>Current Margin:</span>
+                  <span id="price-current-margin">0%</span>
+                </div>
+              </div>
+              <button type="button" class="btn" id="update-price">Update Price</button>
             </div>
+          </div>
+                    
+          <div class="price-list">
+            <h3>Price List</h3>
+            <table class="price-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Production Cost</th>
+                  <th>Current Price</th>
+                  <th>Profit Margin</th>
+                  <th>Last Updated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="price-list-body">
+                <!-- Price list items will be populated by JS -->
+              </tbody>
+            </table>
+          </div>
         </div>
-        
-        <!-- Selling Price Overview Section -->
-        <div class="section">
-            <div class="section-header" onclick="toggleSection(this)">
-                <h2>Selling Price Overview</h2>
-                <span class="toggle-icon"></span>
-            </div>
-            <div class="section-content">
-                <h3>Individual Item Prices</h3>
-                <table id="selling-prices-table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Sale Price ($)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Nails</td>
-                            <td><input type="number" id="nails-price" value="0.30" min="0" step="0.01" onchange="updateAllCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Silver Horseshoe</td>
-                            <td><input type="number" id="silver-horseshoes-price" value="5.00" min="0" step="0.01" onchange="updateAllCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Iron Bar</td>
-                            <td><input type="number" id="iron-bar-price" value="1.00" min="0" step="0.01" onchange="updateAllCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Pickaxe</td>
-                            <td><input type="number" id="pickaxe-price" value="10.00" min="0" step="0.01" onchange="updateAllCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Shell Casing</td>
-                            <td><input type="number" id="shell-casing-price" value="5.00" min="0" step="0.01" onchange="updateAllCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Rifle Barrel</td>
-                            <td><input type="number" id="rifle-barrel-price" value="45.00" min="0" step="0.01" onchange="updateAllCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Horseshoe</td>
-                            <td><input type="number" id="horseshoe-price" value="3.50" min="0" step="0.01" onchange="updateAllCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Hammer</td>
-                            <td><input type="number" id="hammer-price" value="8.00" min="0" step="0.01" onchange="updateAllCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Axe</td>
-                            <td><input type="number" id="axe-price" value="12.00" min="0" step="0.01" onchange="updateAllCalculations()"></td>
-                        </tr>
-                        <tr>
-                            <td>Knife</td>
-                            <td><input type="number" id="knife-price" value="7.00" min="0" step="0.01" onchange="updateAllCalculations()"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                
+        <div class="bundle-pricing">
+          <h3>Bundle Pricing</h3>
+          <div class="bundle-list" id="bundle-container">
+            <!-- Bundle items will be populated by JS -->
+          </div>
         </div>
-        
-        <!-- Shop Selling Boxes Section -->
-        <div class="section">
-            <div class="section-header" onclick="toggleSection(this)">
-                <h2>Shop Selling Boxes</h2>
-                <span class="toggle-icon"></span>
-            </div>
-            <div class="section-content">
-                <h3>Bundle/Box Prices</h3>
-                <table id="box-prices-table">
-                    <thead>
-                        <tr>
-                            <th>Bundle/Box</th>
-                            <th>Price ($)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Shell Casings Box</td>
-                            <td><input type="number" id="shell-casings-box-price" value="35.00" min="0" step="0.01"></td>
-                        </tr>
-                        <tr>
-                            <td>Rifle Set</td>
-                            <td><input type="number" id="rifle-set-price" value="600.00" min="0" step="0.01"></td>
-                        </tr>
-                        <tr>
-                            <td>Repeater Set</td>
-                            <td><input type="number" id="repeater-set-price" value="450.00" min="0" step="0.01"></td>
-                        </tr>
-                        <tr>
-                            <td>Horseshoe Box</td>
-                            <td><input type="number" id="horseshoe-box-price" value="85.00" min="0" step="0.01"></td>
-                        </tr>
-                        <tr>
-                            <td>Blacksmith Tool Set</td>
-                            <td><input type="number" id="blacksmith-tool-set-price" value="120.00" min="0" step="0.01"></td>
-                        </tr>
-                        <tr>
-                            <td>Hunting Essentials Kit</td>
-                            <td><input type="number" id="hunting-essentials-kit-price" value="75.00" min="0" step="0.01"></td>
-                        </tr>
-                        <tr>
-                            <td>Farming Tools Bundle</td>
-                            <td><input type="number" id="farming-tools-bundle-price" value="95.00" min="0" step="0.01"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+      </section>
+            
+      <!-- Reports Section -->
+      <section id="reports" class="content-section">
+        <div class="section-header">
+          <h2>Business Reports</h2>
+          <div class="report-period">
+            <label for="report-period">Period:</label>
+            <select id="report-period">
+              <option value="day">Today</option>
+              <option value="week">This Week</option>
+              <option value="month" selected>This Month</option>
+              <option value="quarter">This Quarter</option>
+              <option value="year">This Year</option>
+              <option value="custom">Custom...</option>
+            </select>
+          </div>
         </div>
+                
+        <div class="reports-dashboard">
+          <div class="report-panel">
+            <h3>Profit & Loss</h3>
+            <div class="chart-container" id="profit-loss-chart">
+              <!-- Chart will be rendered here -->
+              <div class="chart-placeholder">
+                <i class="fas fa-chart-line"></i>
+                <p>Profit & Loss Chart</p>
+              </div>
+            </div>
+            <div class="report-summary">
+              <div class="summary-item">
+                <span>Total Revenue:</span>
+                <span id="report-total-revenue">$0.00</span>
+              </div>
+              <div class="summary-item">
+                <span>Total Costs:</span>
+                <span id="report-total-costs">$0.00</span>
+              </div>
+              <div class="summary-item highlight">
+                <span>Net Profit:</span>
+                <span id="report-net-profit">$0.00</span>
+              </div>
+              <div class="summary-item">
+                <span>Profit Margin:</span>
+                <span id="report-profit-margin">0%</span>
+              </div>
+            </div>
+          </div>
+                    
+          <div class="report-panel">
+            <h3>Top Products</h3>
+            <div class="chart-container" id="top-products-chart">
+              <!-- Chart will be rendered here -->
+              <div class="chart-placeholder">
+                <i class="fas fa-chart-bar"></i>
+                <p>Top Products Chart</p>
+              </div>
+            </div>
+            <div class="product-rankings">
+              <table class="rankings-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Product</th>
+                    <th>Units Sold</th>
+                    <th>Revenue</th>
+                    <th>Profit</th>
+                  </tr>
+                </thead>
+                <tbody id="product-rankings">
+                  <!-- Rankings will be populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+                
+        <div class="report-tools">
+          <button type="button" class="btn btn-secondary" id="export-report">
+            <i class="fas fa-file-export"></i> Export Report
+          </button>
+          <button type="button" class="btn btn-secondary" id="print-report">
+            <i class="fas fa-print"></i> Print Report
+          </button>
+        </div>
+      </section>
+            
+      <!-- Settings Section -->
+      <section id="settings" class="content-section">
+        <div class="section-header">
+          <h2>Settings</h2>
+          <span>Customize your experience</span>
+        </div>
+                
+        <div class="settings-container">
+          <div class="settings-group">
+            <h3>Display Settings</h3>
+            <div class="setting-item">
+              <label for="setting-theme">Theme:</label>
+              <select id="setting-theme">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="system">System Default</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>
+                <input type="checkbox" id="setting-animations" checked> 
+                Enable animations
+              </label>
+            </div>
+            <div class="setting-item">
+              <label for="setting-currency">Currency Symbol:</label>
+              <input type="text" id="setting-currency" value="$" maxlength="3">
+            </div>
+          </div>
+                    
+          <div class="settings-group">
+            <h3>Business Settings</h3>
+            <div class="setting-item">
+              <label for="setting-shop-name">Shop Name:</label>
+              <input type="text" id="setting-shop-name" value="My Blacksmith Shop">
+            </div>
+            <div class="setting-item">
+              <label for="setting-tax-rate">Tax Rate (%):</label>
+              <input type="number" id="setting-tax-rate" value="8" min="0" max="100">
+            </div>
+            <div class="setting-item">
+              <label for="setting-low-stock">Low Stock Threshold:</label>
+              <input type="number" id="setting-low-stock" value="10" min="1">
+            </div>
+          </div>
+                    
+          <div class="settings-group">
+            <h3>Data Management</h3>
+            <div class="setting-actions">
+              <button type="button" class="btn btn-secondary" id="export-data">
+                <i class="fas fa-file-export"></i> Export All Data
+              </button>
+              <button type="button" class="btn btn-secondary" id="import-data">
+                <i class="fas fa-file-import"></i> Import Data
+              </button>
+              <button type="button" class="btn btn-danger" id="reset-data">
+                <i class="fas fa-trash"></i> Reset All Data
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal Templates -->
+  <div class="modal" id="modal-container">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">Modal Title</h3>
+        <button type="button" class="modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- Modal content will be populated dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="modal-cancel">Cancel</button>
+        <button type="button" class="btn" id="modal-confirm">Confirm</button>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // Data structure for craftable items
-        const craftableItems = {
-            'iron-bar': {
-                name: 'Iron Bar',
-                outputQuantity: 5,
-                ingredients: {
-                    'iron-ore': 5,
-                    'coal': 2
-                },
-                value: 1.00
-            },
-            'nails': {
-                name: 'Nails',
-                outputQuantity: 5,
-                ingredients: {
-                    'iron-bar': 1
-                },
-                value: 0.30
-            },
-            'shell-casing': {
-                name: 'Shell Casing',
-                outputQuantity: 20,
-                ingredients: {
-                    'iron-bar': 5,
-                    'copper': 2
-                },
-                value: 5.00
-            },
-            'silver-horseshoes': {
-                name: 'Silver Horseshoes',
-                outputQuantity: 2,
-                ingredients: {
-                    'iron-ore': 4,
-                    'coal': 2
-                },
-                value: 5.00
-            },
-            'pickaxe': {
-                name: 'Pickaxe',
-                outputQuantity: 1,
-                ingredients: {
-                    'iron-bar': 2,
-                    'wood-logs': 1
-                },
-                value: 10.00
-            }
-        };
-
-        // Function to toggle section visibility
-        function toggleSection(element) {
-            element.classList.toggle('active');
-            const content = element.nextElementSibling;
-            content.classList.toggle('active');
-        }
-        
-        // Function to toggle item visibility
-        function toggleItem(element) {
-            element.classList.toggle('active');
-            const content = element.nextElementSibling;
-            content.classList.toggle('active');
-        }
-        
-        // Function to get material cost
-        function getMaterialCost(materialId) {
-            const element = document.getElementById(materialId + '-cost');
-            return element && element.value ? parseFloat(element.value) : 0;
-        }
-        
-        // Function to update item costs
-        function updateItemCosts(itemId) {
-            let totalCost = 0;
-            
-            if (itemId === 'nails') {
-                const ironBarQty = parseFloat(document.getElementById('nails-iron-bar').value);
-                const ironBarCost = parseFloat(document.getElementById('iron-bar-cost').textContent);
-                totalCost = (ironBarQty * ironBarCost) / 5;
-            } else if (itemId === 'shell-casing') {
-                const ironBarQty = parseFloat(document.getElementById('shell-casing-iron-bar').value);
-                const copperQty = parseFloat(document.getElementById('shell-casing-copper').value);
-                const ironBarCost = parseFloat(document.getElementById('iron-bar-cost').textContent);
-                const copperCost = getMaterialCost('copper');
-                totalCost = ((ironBarQty * ironBarCost) / 5) + (copperQty * copperCost);
-            } else if (itemId === 'pickaxe') {
-                const ironBarQty = parseFloat(document.getElementById('pickaxe-iron-bar').value);
-                const woodLogsQty = parseFloat(document.getElementById('pickaxe-wood-logs').value);
-                const ironBarCost = parseFloat(document.getElementById('iron-bar-cost').textContent);
-                const woodLogsCost = getMaterialCost('wood-logs');
-                totalCost = ((ironBarQty * ironBarCost) / 5) + (woodLogsQty * woodLogsCost);
-            } else if (itemId === 'iron-bar') {
-                const ironOreQty = parseFloat(document.getElementById('iron-bar-iron-ore').value);
-                const coalQty = parseFloat(document.getElementById('iron-bar-coal').value);
-                const ironOreCost = getMaterialCost('iron-ore');
-                const coalCost = getMaterialCost('coal');
-                totalCost = (ironOreQty * ironOreCost) + (coalQty * coalCost);
-            } else if (itemId === 'silver-horseshoes') {
-                const ironOreQty = parseFloat(document.getElementById('silver-horseshoes-iron-ore').value);
-                const coalQty = parseFloat(document.getElementById('silver-horseshoes-coal').value);
-                const ironOreCost = getMaterialCost('iron-ore');
-                const coalCost = getMaterialCost('coal');
-                totalCost = (ironOreQty * ironOreCost) + (coalQty * coalCost);
-            }
-            
-            const costElement = document.getElementById(itemId + '-cost');
-            costElement.textContent = totalCost.toFixed(2);
-            
-            const valueElement = document.getElementById(itemId + '-value');
-            const value = parseFloat(valueElement.value);
-            const profit = value - totalCost;
-            
-            const profitElement = document.getElementById(itemId + '-profit');
-            profitElement.textContent = profit.toFixed(2);
-            
-            if (profit >= 0) {
-                profitElement.className = 'profit-positive';
-            } else {
-                profitElement.className = 'profit-negative';
-            }
-        }
-        
-        // Function to update all calculations
-        function updateAllCalculations() {
-            updateItemCosts('iron-bar');
-            updateItemCosts('nails');
-            updateItemCosts('shell-casing');
-            updateItemCosts('silver-horseshoes');
-            updateItemCosts('pickaxe');
-            
-            document.getElementById('nails-value').value = document.getElementById('nails-price').value;
-            document.getElementById('silver-horseshoes-value').value = document.getElementById('silver-horseshoes-price').value;
-            document.getElementById('iron-bar-value').value = document.getElementById('iron-bar-price').value;
-            document.getElementById('pickaxe-value').value = document.getElementById('pickaxe-price').value;
-            document.getElementById('shell-casing-value').value = document.getElementById('shell-casing-price').value;
-            
-            updateProductionCalculator();
-        }
-        
-        // Function to update calculations when material costs change
-        function updateCalculations() {
-            updateAllCalculations();
-        }
-        
-        // Function to calculate raw materials needed for production
-        function calculateRawMaterials(itemId, quantity) {
-            const rawMaterials = {
-                'wood-logs': 0,
-                'iron-ore': 0,
-                'coal': 0,
-                'buck-skin': 0,
-                'copper': 0,
-                'clay': 0,
-                'iron-bar': 0
-            };
-            
-            if (itemId === 'iron-bar') {
-                rawMaterials['iron-ore'] += quantity * parseFloat(document.getElementById('iron-bar-iron-ore').value);
-                rawMaterials['coal'] += quantity * parseFloat(document.getElementById('iron-bar-coal').value);
-            } else if (itemId === 'nails') {
-                let ironBarNeeded = quantity * parseFloat(document.getElementById('nails-iron-bar').value);
-                let ironBarMaterials = calculateRawMaterials('iron-bar', ironBarNeeded);
-                for (let mat in ironBarMaterials) {
-                    rawMaterials[mat] += ironBarMaterials[mat];
-                }
-            } else if (itemId === 'shell-casing') {
-                let ironBarNeeded = quantity * parseFloat(document.getElementById('shell-casing-iron-bar').value);
-                let copperNeeded = quantity * parseFloat(document.getElementById('shell-casing-copper').value);
-                let ironBarMaterials = calculateRawMaterials('iron-bar', ironBarNeeded);
-                for (let mat in ironBarMaterials) {
-                    rawMaterials[mat] += ironBarMaterials[mat];
-                }
-                rawMaterials['copper'] += copperNeeded;
-            } else if (itemId === 'silver-horseshoes') {
-                rawMaterials['iron-ore'] += quantity * parseFloat(document.getElementById('silver-horseshoes-iron-ore').value);
-                rawMaterials['coal'] += quantity * parseFloat(document.getElementById('silver-horseshoes-coal').value);
-            } else if (itemId === 'pickaxe') {
-                let ironBarNeeded = quantity * parseFloat(document.getElementById('pickaxe-iron-bar').value);
-                let woodLogsNeeded = quantity * parseFloat(document.getElementById('pickaxe-wood-logs').value);
-                let ironBarMaterials = calculateRawMaterials('iron-bar', ironBarNeeded);
-                for (let mat in ironBarMaterials) {
-                    rawMaterials[mat] += ironBarMaterials[mat];
-                }
-                rawMaterials['wood-logs'] += woodLogsNeeded;
-            }
-            return rawMaterials;
-        }
-        
-        // Function to update production calculator results
-        function updateProductionCalculator() {
-            const itemSelect = document.getElementById('item-select').value;
-            const quantity = parseInt(document.getElementById('quantity').value);
-            
-            const materialsNeeded = calculateRawMaterials(itemSelect, quantity);
-            
-            const materialsList = document.getElementById('materials-list');
-            materialsList.innerHTML = '';
-            for (let material in materialsNeeded) {
-                if (materialsNeeded[material] > 0) {
-                    const li = document.createElement('li');
-                    li.textContent = material + ': ' + materialsNeeded[material];
-                    materialsList.appendChild(li);
-                }
-            }
-            
-            let totalCost = 0;
-            for (let material in materialsNeeded) {
-                totalCost += materialsNeeded[material] * getMaterialCost(material);
-            }
-            
-            let salePrice = parseFloat(document.getElementById(itemSelect + '-price').value);
-            let totalValue = salePrice * quantity;
-            let profit = totalValue - totalCost;
-            
-            document.getElementById('production-cost').textContent = totalCost.toFixed(2);
-            document.getElementById('production-value').textContent = totalValue.toFixed(2);
-            document.getElementById('production-profit').textContent = profit.toFixed(2);
-        }
-        
-        // Initial calculations on page load
-        window.onload = function() {
-            updateAllCalculations();
-        };
-    </script>
+  <!-- JavaScript Files -->
+  <script src="js/data.js"></script>
+  <script src="js/inventory.js"></script>
+  <script src="js/recipes.js"></script>
+  <script src="js/production.js"></script>
+  <script src="js/pricing.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
